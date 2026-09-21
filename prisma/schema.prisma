@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  // DATABASE_URL: Supabase's pooled ("Transaction") connection string -
+  // required for serverless/Vercel since each invocation opens a new
+  // connection and Postgres has a low direct-connection limit.
+  url       = env("DATABASE_URL")
+  // DIRECT_URL: Supabase's direct (non-pooled) connection string, used only
+  // for `prisma migrate`/`db push`, which need a session-mode connection.
+  directUrl = env("DIRECT_URL")
+}
+
+// ---------------------------------------------------------------------------
+// App models
+// ---------------------------------------------------------------------------
+// NOTE: Auth itself (sign-up, sessions, OAuth, password hashing) is fully
+// handled by Supabase in its own `auth.users` table - we never touch that
+// table or its schema. This `User` model is a *profile* row in our own
+// `public` schema, one-to-one with a Supabase auth user, keyed by the same
+// UUID (`id` = Supabase's `auth.uid()`). It's created on first request via
+// `getOrCreateProfile()` in src/lib/supabase/server.ts - there is no adapter
+// auto-creating it anymore, so never assume it exists without that call.
+model User {
+  id    String  @id // matches Supabase auth.users.id (uuid) - not auto-generated here
+  email String? @unique
+  name  String?
+  image String?
+
+  // Billing / metering
+  isAdmin                Boolean   @default(false)
+  plan                   String    @default("free") // free | pro
+  messageCount           Int       @default(0)
+  stripeCustomerId       String?   @unique
+  stripeSubId            String?
+  stripeStatus           String? // active | past_due | canceled | trialing ...
+  stripeCurrentPeriodEnd DateTime?
+
+  chats ChatSession[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ChatSession {
+  id        String    @id @default(cuid())
+  title     String    @default("New chat")
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  Message[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Message {
+  id            String      @id @default(cuid())
+  chatSessionId String
+  chatSession   ChatSession @relation(fields: [chatSessionId], references: [id], onDelete: Cascade)
+
+  role      String // user | assistant | system
+  content   String  @db.Text
+  imageUrl  String? // set when this message is/contains a generated image
+  createdAt DateTime @default(now())
+}
