@@ -19,7 +19,7 @@ export async function generateImage(prompt: string): Promise<GeneratedImage> {
       quality: "hd",
     });
 
-    const image = result.data[0];
+    const image = result.data?.[0];
     if (!image?.url) {
       throw new Error("No image returned from provider.");
     }
