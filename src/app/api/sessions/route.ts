@@ -21,6 +21,17 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json().catch(() => ({}));
 
+  // Ensure the user exists in Prisma before creating a session
+  await prisma.user.upsert({
+    where: { id: user.id },
+    update: {},
+    create: {
+      id: user.id,
+      email: user.email || "",
+      name: user.user_metadata?.full_name || user.email || "User",
+    },
+  });
+
   const chat = await prisma.chatSession.create({
     data: { userId: user.id, title: body?.title || "New chat" },
   });
