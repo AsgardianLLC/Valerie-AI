@@ -2,7 +2,7 @@
 
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
-import { Plus, MessageSquare, Trash2, LogOut, Shield, Sparkles, Menu, X } from "lucide-react";
+import { Plus, MessageSquare, Trash2, LogOut, Shield, Sparkles, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import type { ChatSessionSummary, UsageInfo } from "@/types";
 import { useState } from "react";
 
@@ -24,7 +24,7 @@ export default function Sidebar({
   onDeleteChat: (id: string) => void;
 }) {
   const supabase = createClient();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   const displayName =
     (user.user_metadata?.full_name as string | undefined) ??
@@ -33,19 +33,16 @@ export default function Sidebar({
 
   return (
     <>
-      {/* Mobile Header Toggle Bar */}
-      <div className="flex md:hidden items-center justify-between bg-neutral-900 border-b border-neutral-800 px-4 py-3 sticky top-0 z-40">
-        <div className="flex items-center gap-2 text-lg font-semibold text-white">
-          <Sparkles className="h-5 w-5 text-brand-400" />
-          Valerie
-        </div>
+      {/* Floating Toggle Button when Sidebar is Closed (Desktop & Mobile) */}
+      {!isOpen && (
         <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="text-neutral-300 p-1 rounded-lg hover:bg-neutral-800"
+          onClick={() => setIsOpen(true)}
+          title="Open sidebar"
+          className="fixed top-3 left-3 z-50 rounded-lg bg-neutral-900 border border-neutral-800 p-2 text-neutral-300 hover:bg-neutral-800 hover:text-white transition shadow-lg"
         >
-          {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          <PanelLeftOpen className="h-5 w-5" />
         </button>
-      </div>
+      )}
 
       {/* Backdrop overlay for mobile when drawer is open */}
       {isOpen && (
@@ -57,21 +54,30 @@ export default function Sidebar({
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-72 shrink-0 flex-col border-r border-neutral-800 bg-neutral-900 transition-transform duration-300 md:static md:translate-x-0 ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed inset-y-0 left-0 z-50 flex w-72 shrink-0 flex-col border-r border-neutral-800 bg-neutral-900 transition-transform duration-300 md:static ${
+          isOpen ? "translate-x-0" : "-translate-x-full md:hidden"
         }`}
       >
-        <div className="hidden md:flex items-center gap-2 px-4 py-4 text-lg font-semibold text-white">
-          <Sparkles className="h-5 w-5 text-brand-400" />
-          Valerie
+        <div className="flex items-center justify-between px-4 py-4 text-lg font-semibold text-white">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-brand-400" />
+            Valerie
+          </div>
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            title="Close sidebar"
+            className="rounded-lg p-1.5 text-neutral-400 hover:bg-neutral-800 hover:text-white transition"
+          >
+            <PanelLeftClose className="h-5 w-5" />
+          </button>
         </div>
 
         <button
           onClick={() => {
             onNewChat();
-            setIsOpen(false);
+            if (window.innerWidth < 768) setIsOpen(false);
           }}
-          className="mx-3 mt-4 md:mt-0 mb-3 flex items-center justify-center gap-2 rounded-lg border border-neutral-700 py-2 text-sm font-medium text-neutral-200 transition hover:bg-neutral-800"
+          className="mx-3 mb-3 flex items-center justify-center gap-2 rounded-lg border border-neutral-700 py-2 text-sm font-medium text-neutral-200 transition hover:bg-neutral-800"
         >
           <Plus className="h-4 w-4" /> New chat
         </button>
@@ -85,7 +91,7 @@ export default function Sidebar({
               }`}
               onClick={() => {
                 onSelectChat(chat.id);
-                setIsOpen(false);
+                if (window.innerWidth < 768) setIsOpen(false);
               }}
             >
               <div className="flex min-w-0 items-center gap-2">
