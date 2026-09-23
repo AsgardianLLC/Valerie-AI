@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     create: {
       id: user.id,
       email: user.email || "",
-      name: user.user_metadata?.full_name || user.email || "User",
+      name: user.name || user.email || "User",
     },
   });
 
