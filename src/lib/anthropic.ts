@@ -1,7 +1,7 @@
-import OpenAI from "openai";
+import { GoogleGenAI } from "@google/genai";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY,
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY,
 });
 
 export type ChatTurn = {
@@ -20,49 +20,41 @@ export async function streamChatCompletion({
   temperature?: number;
   imageBase64?: { data: string; mediaType: string }[];
 }) {
-  const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [];
-
-  if (systemPrompt) {
-    messages.push({ role: "system", content: systemPrompt });
-  }
+  const contents: any[] = [];
 
   for (const turn of history) {
-    messages.push({
-      role: turn.role,
-      content: turn.content,
+    contents.push({
+      role: turn.role === "assistant" ? "model" : "user",
+      parts: [{ text: turn.content }],
     });
   }
 
-  // Handle multimodal image input if passed
-  if (imageBase64 && imageBase64.length > 0 && messages.length > 0) {
-    const lastMessage = messages[messages.length - 1];
-    if (lastMessage && lastMessage.role === "user") {
-      const contentParts: any[] = [{ type: "text", text: lastMessage.content || "" }];
-      for (const img of imageBase64) {
-        contentParts.push({
-          type: "image_url",
-          image_url: {
-            url: `data:${img.mediaType};base64,${img.data}`,
-          },
-        });
-      }
-      lastMessage.content = contentParts;
+  // Attach images to the latest prompt turn if present
+  if (imageBase64 && imageBase64.length > 0 && contents.length > 0) {
+    const lastContent = contents[contents.length - 1];
+    for (const img of imageBase64) {
+      lastContent.parts.push({
+        inlineData: {
+          data: img.data,
+          mimeType: img.mediaType,
+        },
+      });
     }
   }
 
-  const response = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages,
-    temperature,
-    stream: true,
+  const responseStream = await ai.models.generateContentStream({
+    model: "gemini-2.5-flash",
+    contents,
+    config: {
+      systemInstruction: systemPrompt,
+      temperature,
+    },
   });
 
-  // Return an async iterable that yields string chunks directly
   return (async function* () {
-    for await (const chunk of response) {
-      const delta = chunk.choices[0]?.delta?.content || "";
-      if (delta) {
-        yield delta;
+    for await (const chunk of responseStream) {
+      if (chunk.text) {
+        yield chunk.text;
       }
     }
   })();
