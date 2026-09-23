@@ -42,7 +42,7 @@ export async function streamChatCompletion({
   }
 
   const responseStream = await ai.models.generateContentStream({
-    model: "gemini-2.5-flash",
+    model: "gemini-3.6-flash",
     contents,
     config: {
       systemInstruction: systemPrompt,
