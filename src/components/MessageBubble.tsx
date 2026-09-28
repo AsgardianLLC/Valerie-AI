@@ -5,7 +5,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
-import { Copy, Check, User, Sparkles, Download } from "lucide-react";
+import { Copy, Check, User, Download } from "lucide-react";
 import type { ChatMessage } from "@/types";
 
 function CodeBlock({ language, code }: { language: string; code: string }) {
@@ -43,7 +43,11 @@ export default function MessageBubble({ message }: { message: ChatMessage }) {
           isUser ? "bg-neutral-700" : "bg-brand-500"
         }`}
       >
-        {isUser ? <User className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}
+        {isUser ? (
+          <User className="h-4 w-4" />
+        ) : (
+          <img src="/mjolnir.png" alt="ÆSIR Avatar" className="h-4 w-4 object-contain" />
+        )}
       </div>
 
       <div className="min-w-0 flex-1">

@@ -178,7 +178,10 @@ export default function ChatWindow({
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between border-b border-neutral-800 px-4 py-3">
-        <h2 className="text-sm font-medium text-neutral-300">Aesir</h2>
+        <div className="flex items-center gap-2">
+          <img src="/mjolnir.png" alt="Aesir Logo" className="h-5 w-5 object-contain" />
+          <h2 className="text-sm font-medium text-neutral-300">Aesir</h2>
+        </div>
         <button onClick={() => setShowSettings((s) => !s)} className="text-neutral-500 hover:text-neutral-300">
           <Settings className="h-4 w-4" />
         </button>

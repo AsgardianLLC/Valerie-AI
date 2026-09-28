@@ -2,7 +2,7 @@
 
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
-import { Plus, MessageSquare, Trash2, LogOut, Shield, Sparkles, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { Plus, MessageSquare, Trash2, LogOut, Shield, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import type { ChatSessionSummary, UsageInfo } from "@/types";
 import { useState } from "react";
 
@@ -60,7 +60,7 @@ export default function Sidebar({
       >
         <div className="flex items-center justify-between px-4 py-4 text-lg font-semibold text-white">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-brand-400" />
+            <img src="/mjolnir.png" alt="ÆSIR Logo" className="h-6 w-6 object-contain" />
             Aesir
           </div>
           <button
