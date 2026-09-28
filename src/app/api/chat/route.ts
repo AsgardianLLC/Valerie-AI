@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
       .filter((m) => m.role === "user" || m.role === "assistant")
       .map((m) => ({ role: m.role as "user" | "assistant", content: m.content }));
 
-    // Retry loop to handle temporary 503 / high demand spikes directly in the route
+    // Safe retry loop handling JSON stringified 503 error payloads
     let claudeStream;
     let retries = 3;
     let delay = 1000;
@@ -112,20 +112,29 @@ export async function POST(req: NextRequest) {
           temperature,
           imageBase64,
         });
-        break; // Successfully initialized stream, break out of loop
+        break; // Stream initialized successfully
       } catch (err: any) {
         retries--;
-        const status = err?.status || err?.statusCode;
-        const is503 = status === 503 || err?.message?.includes("overloaded") || err?.message?.includes("high demand");
+
+        // Check error string, status code, and raw body message safely
+        const errString = typeof err === "string" ? err : JSON.stringify(err || {});
+        const status = err?.status || err?.statusCode || err?.code;
+        
+        const is503 =
+          status === 503 ||
+          errString.includes("503") ||
+          errString.includes("UNAVAILABLE") ||
+          errString.includes("high demand") ||
+          errString.includes("overloaded");
 
         if (is503 && retries > 0) {
-          console.warn(`[Chat API] Provider overloaded (503). Retrying in ${delay}ms... (${retries} retries remaining)`);
+          console.warn(`[Chat API] Provider capacity spike (503/UNAVAILABLE). Retrying in ${delay}ms... (${retries} attempts left)`);
           await new Promise((res) => setTimeout(res, delay));
-          delay *= 2; // Wait longer each retry (1s, then 2s)
+          delay *= 2; // Exponential backoff (1s -> 2s)
         } else {
           console.error("STREAM_INIT_FAILED:", err);
           return NextResponse.json(
-            { error: "ÆSIR is currently experiencing high demand. Please try again in a few seconds." },
+            { error: "ÆSIR is currently under heavy demand. Please try again in a few seconds." },
             { status: 503 }
           );
         }
