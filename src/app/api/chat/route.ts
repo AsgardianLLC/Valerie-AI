@@ -99,12 +99,38 @@ export async function POST(req: NextRequest) {
       .filter((m) => m.role === "user" || m.role === "assistant")
       .map((m) => ({ role: m.role as "user" | "assistant", content: m.content }));
 
-    const claudeStream = await streamChatCompletion({
-      history,
-      systemPrompt,
-      temperature,
-      imageBase64,
-    });
+    // Retry loop to handle temporary 503 / high demand spikes directly in the route
+    let claudeStream;
+    let retries = 3;
+    let delay = 1000;
+
+    while (retries > 0) {
+      try {
+        claudeStream = await streamChatCompletion({
+          history,
+          systemPrompt,
+          temperature,
+          imageBase64,
+        });
+        break; // Successfully initialized stream, break out of loop
+      } catch (err: any) {
+        retries--;
+        const status = err?.status || err?.statusCode;
+        const is503 = status === 503 || err?.message?.includes("overloaded") || err?.message?.includes("high demand");
+
+        if (is503 && retries > 0) {
+          console.warn(`[Chat API] Provider overloaded (503). Retrying in ${delay}ms... (${retries} retries remaining)`);
+          await new Promise((res) => setTimeout(res, delay));
+          delay *= 2; // Wait longer each retry (1s, then 2s)
+        } else {
+          console.error("STREAM_INIT_FAILED:", err);
+          return NextResponse.json(
+            { error: "ÆSIR is currently experiencing high demand. Please try again in a few seconds." },
+            { status: 503 }
+          );
+        }
+      }
+    }
 
     const encoder = new TextEncoder();
 
@@ -121,11 +147,13 @@ export async function POST(req: NextRequest) {
           }
 
           // Persist assistant response after stream completes successfully
-          await prisma.message.create({
-            data: { chatSessionId, role: "assistant", content: fullText },
-          });
-          if (!usage.isAdmin) {
-            await recordUsage(userId);
+          if (fullText.trim()) {
+            await prisma.message.create({
+              data: { chatSessionId, role: "assistant", content: fullText },
+            });
+            if (!usage.isAdmin) {
+              await recordUsage(userId);
+            }
           }
           controller.close();
         } catch (err: any) {
