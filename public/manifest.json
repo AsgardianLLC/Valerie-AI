@@ -1,22 +1,20 @@
 {
   "name": "Aesir AI",
-  "short_name": "Aesir",
+  "short_name": "Aesir AI",
   "start_url": "/",
-  "scope": "/",
   "display": "standalone",
-  "background_color": "#0a0a0a",
-  "theme_color": "#0a0a0a",
+  "background_color": "#0d1117",
+  "theme_color": "#00f0ff",
   "icons": [
     {
-      "src": "/icon.png",
+      "src": "/Aesir192x192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/icon.png",
+      "src": "/Aesir512x512.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ]
 }
