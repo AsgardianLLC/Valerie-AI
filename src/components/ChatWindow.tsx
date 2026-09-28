@@ -27,7 +27,7 @@ export default function ChatWindow({
   const [attachment, setAttachment] = useState<Attachment | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [systemPrompt, setSystemPrompt] = useState(
-    "You are Valerie, a helpful, concise, and friendly multimodal AI assistant."
+    "You are Aesir, a helpful, concise, and friendly multimodal AI assistant."
   );
   const [temperature, setTemperature] = useState(0.7);
 
@@ -178,7 +178,7 @@ export default function ChatWindow({
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between border-b border-neutral-800 px-4 py-3">
-        <h2 className="text-sm font-medium text-neutral-300">Valerie</h2>
+        <h2 className="text-sm font-medium text-neutral-300">Aesir</h2>
         <button onClick={() => setShowSettings((s) => !s)} className="text-neutral-500 hover:text-neutral-300">
           <Settings className="h-4 w-4" />
         </button>
@@ -216,7 +216,7 @@ export default function ChatWindow({
         ))}
         {sending && (
           <div className="flex items-center gap-2 px-8 py-2 text-sm text-neutral-500">
-            <Loader2 className="h-3.5 w-3.5 animate-spin" /> Valerie is thinking...
+            <Loader2 className="h-3.5 w-3.5 animate-spin" /> Aesir is thinking...
           </div>
         )}
         <div ref={bottomRef} />
@@ -267,7 +267,7 @@ export default function ChatWindow({
                 send();
               }
             }}
-            placeholder={imageMode ? "Describe the image to generate... (or use /image <prompt> anytime)" : "Message Valerie..."}
+            placeholder={imageMode ? "Describe the image to generate... (or use /image <prompt> anytime)" : "Message Aesir..."}
             rows={1}
             className="max-h-40 flex-1 resize-none bg-transparent px-1 py-2 text-sm outline-none placeholder:text-neutral-500"
           />

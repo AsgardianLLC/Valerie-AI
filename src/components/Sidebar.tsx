@@ -61,7 +61,7 @@ export default function Sidebar({
         <div className="flex items-center justify-between px-4 py-4 text-lg font-semibold text-white">
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-brand-400" />
-            Valerie
+            Aesir
           </div>
           <button
             onClick={() => setIsOpen(!isOpen)}
