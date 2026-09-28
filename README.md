@@ -1,4 +1,4 @@
-# Valerie — Multimodal AI Assistant
+# Aesir — Multimodal AI Assistant
 
 A Claude-style chat app with vision uploads, native AI image generation, Google sign-in,
 message metering, an admin bypass, and Stripe billing — built on **Supabase** (auth +
@@ -103,17 +103,17 @@ Visit http://localhost:3000 and sign in with Google.
 ```bash
 git init
 git add .
-git commit -m "Valerie: Supabase-based auth and database"
+git commit -m "aesir: Supabase-based auth and database"
 git branch -M main
-git remote add origin https://github.com/<your-username>/valerie-ai.git
+git remote add origin https://github.com/<your-username>/aesir-ai.git
 git push -u origin main
 ```
 
 ## 4. Deploy to Vercel (free)
 
-1. [vercel.com/new](https://vercel.com/new) → import the `valerie-ai` repo.
+1. [vercel.com/new](https://vercel.com/new) → import the `aesir-ai` repo.
 2. Paste in every variable from `.env`, but set `NEXT_PUBLIC_SITE_URL` to your Vercel
-   domain (e.g. `https://valerie-ai.vercel.app`).
+   domain (e.g. `https://aesir-ai.vercel.app`).
 3. Deploy.
 4. Back in Supabase → Authentication → URL Configuration: add
    `https://<your-vercel-domain>/auth/callback` to Redirect URLs (keep the localhost one
