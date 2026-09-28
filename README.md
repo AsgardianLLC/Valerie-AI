@@ -7,7 +7,7 @@ Postgres) and Prisma, fully independent of any third-party backend builder.
 ## Architecture
 
 ```
-valerie-ai/
+aesir-ai/
 ├── prisma/
 │   └── schema.prisma          # User (profile), ChatSession, Message models
 ├── src/
