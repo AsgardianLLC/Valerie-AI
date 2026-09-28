@@ -2,13 +2,13 @@ import type { Metadata, Viewport } from "next";
 import "@/styles/globals.css";
 
 export const metadata: Metadata = {
-  title: "Valerie — AI Assistant",
+  title: "ÆSIR — AI Assistant",
   description: "Multimodal AI assistant with text, vision, and image generation.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Valerie",
+    title: "ÆSIR",
   },
   other: {
     "mobile-web-app-capable": "yes",
